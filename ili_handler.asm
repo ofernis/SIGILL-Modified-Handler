@@ -2,14 +2,12 @@
 
 .text
 .align 4, 0x90
+
 my_ili_handler:
-  pushq %rsi
-  pushq %rbp
-  pushq %rsp
   pushq %rax
   pushq %rbx
   pushq %rcx
-  pushq %rdx
+  //pushq %rdx
   pushq %r8
   pushq %r9
   pushq %r10
@@ -18,25 +16,30 @@ my_ili_handler:
   pushq %r13
   pushq %r14
   pushq %r15
+  pushq %rsi
+  pushq %rbp
+  pushq %rsp
 
   xorq %rax, %rax
-  xorq %rcx, %rcx
+  xorq %rbx, %rbx
   xorq %rdi, %rdi
-  movq 120(%rsp), %rcx
-  movq (%rcx), %rcx
-  cmpb $0x0f, %cl
+  xorq %rdx, %rdx
+  addq $1, %rdx
+  movq 112(%rsp), %rbx
+  movq (%rbx), %rbx
+  cmpb $0x0f, %bl
   jne one_byte_opcode
-
+  addq $1, %rdx # mark that the opcode is 2-byte long
 two_byte_opcode:
-  movb %ch, %al
+  movb %bh, %al
   movq %rax, %rdi
   call what_to_do
   cmpq $0, %rax
   je default_ili_handler
-  jmp modified_ili_handler 
+  jmp modified_ili_handler
 
-one_byte__opcode:
-  movb %cl, %al
+one_byte_opcode:
+  movb %bl, %al
   movq %rax, %rdi
   call what_to_do
   cmpq $0, %rax
@@ -44,42 +47,41 @@ one_byte__opcode:
   jmp modified_ili_handler
 
 default_ili_handler:
-  popq %rsi
-  popq %rbp
   popq %rsp
-  popq %rax
-  popq %rbx
-  popq %rcx
-  popq %rdx
-  popq %r8
-  popq %r9
-  popq %r10
-  popq %r11
-  popq %r12
-  popq %r13
-  popq %r14
+  popq %rbp
+  popq %rsi
   popq %r15
+  popq %r14
+  popq %r13
+  popq %r12
+  popq %r11
+  popq %r10
+  popq %r9
+  popq %r8
+  //popq %rdx
+  popq %rcx
+  popq %rbx
+  popq %rax
   jmp * old_ili_handler
-  jmp end
 
 modified_ili_handler:
   movq %rax, %rdi
-  popq %rsi
-  popq %rbp
   popq %rsp
-  popq %rax
-  popq %rbx
-  popq %rcx
-  popq %rdx
-  popq %r8
-  popq %r9
-  popq %r10
-  popq %r11
-  popq %r12
-  popq %r13
-  popq %r14
+  popq %rbp
+  popq %rsi
   popq %r15
-  addq $2, (%rsp)
+  popq %r14
+  popq %r13
+  popq %r12
+  popq %r11
+  popq %r10
+  popq %r9
+  popq %r8
+  //popq %rdx
+  popq %rcx
+  popq %rbx
+  popq %rax
+  addq %rdx, (%rsp)
 
 end:
   iretq
