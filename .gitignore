@@ -17,3 +17,4 @@ Module.symvers
 modules.order
 ili.mod.c
 .tmp_versions/ili.mod
+filesystem.img
